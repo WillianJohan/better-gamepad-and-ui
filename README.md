@@ -47,7 +47,7 @@ BGUI.reload()
 BGUI.status()
 ```
 
-Se `BGUI.reload()` der *Object tried to call nil*, a tabela ficou half-dead — use **`BGUI_rebootstrap()`** (global) ou reinicie o save. Isso limpa `package.loaded` dos módulos `BGUI/*`, reexecuta o bootstrap e redefine `reload`/`status`/`_router`.
+Se `BGUI.reload()` / `BGUI.status()` derem *Object tried to call nil*, a tabela ficou half-dead — use as globals **`BGUI_rebootstrap()`**, **`BGUI_reload()`** ou **`BGUI_status()`**, ou reinicie o save (Menu → Load). Isso limpa `package.loaded` dos módulos `BGUI/*`, reexecuta o bootstrap e redefine `reload`/`status`/`_router`.
 
 | Reload / rebootstrap basta | Ainda precisa menu → Load (ou restart) |
 |----------------------------|----------------------------------------|

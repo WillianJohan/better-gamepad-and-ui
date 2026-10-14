@@ -90,10 +90,14 @@ BGUI.clearLoadedModules()
 
 package.loaded["BGUI/StubModule"] = { marker = true }
 package.loaded["BGUI.OtherStub"] = { marker = true }
+package.loaded["BGUI\\bootstrap"] = { marker = true }
+package.loaded["media/lua/client/BGUI/Debug"] = { marker = true }
 package.loaded["OtherMod/X"] = { keep = true }
 BGUI.clearLoadedModules()
 assert(package.loaded["BGUI/StubModule"] == nil, "clears BGUI/ keys")
 assert(package.loaded["BGUI.OtherStub"] == nil, "clears BGUI. keys")
+assert(package.loaded["BGUI\\bootstrap"] == nil, "clears BGUI\\\\ path keys")
+assert(package.loaded["media/lua/client/BGUI/Debug"] == nil, "clears path-prefixed BGUI keys")
 assert(package.loaded["OtherMod/X"] ~= nil, "leaves non-BGUI keys")
 
 -- painel aberto fecha sem crash
@@ -164,3 +168,34 @@ assert(BGUI._router ~= nil, "router with joypad")
 assert(BGUI._router:getMode() == BGUI.InputMode.GAMEPAD, "probe forces gamepad")
 assert(BGUI._activeShell == "gamepad", "shell is gamepad when pad assigned")
 JoypadState = nil
+
+-- Globals resilientes no console (não morrem com wipe da tabela BGUI)
+assert(type(BGUI_reload) == "function", "BGUI_reload global")
+assert(type(BGUI_status) == "function", "BGUI_status global")
+BGUI.reload = nil
+BGUI.status = nil
+local rbViaGlobal = BGUI_reload()
+assert(rbViaGlobal == true, "BGUI_reload recovers when table helpers are nil")
+assert(type(BGUI.reload) == "function", "BGUI_reload restored table.reload")
+local st2 = BGUI_status()
+assert(st2 and st2.bootOk == true, "BGUI_status works via global")
+
+-- require no-op (simula cache Kahlua) não pode matar helpers nem mentir "ok"
+local realRequire = _G.require
+local swallowBootstrap = true
+_G.require = function(name)
+  if swallowBootstrap and (name == "BGUI/bootstrap" or name == "BGUI\\bootstrap") then
+    return package.loaded[name] or true
+  end
+  return realRequire(name)
+end
+local keepRouter = BGUI._router
+local okNoop = BGUI.reload()
+swallowBootstrap = false
+_G.require = realRequire
+assert(okNoop == false, "no-op require must fail reload")
+assert(type(BGUI.reload) == "function", "helpers survive no-op require")
+assert(type(BGUI.status) == "function", "status survives no-op require")
+assert(BGUI_rebootstrap() == true, "rebootstrap after no-op require")
+assert(BGUI._router ~= nil, "router after rebootstrap")
+assert(keepRouter ~= nil, "had router before no-op test")

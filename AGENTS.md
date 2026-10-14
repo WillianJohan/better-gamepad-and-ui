@@ -29,11 +29,13 @@ Após `scripts/dev-sync.sh`, no **console de debug** Lua do PZ:
 
 ```lua
 BGUI_rebootstrap()   -- recuperação se reload sumiu / tabela half-dead
+BGUI_status()        -- global resiliente (equivale a BGUI.status)
+BGUI_reload()        -- global resiliente; se reload nil, cai pra rebootstrap
 BGUI.status()        -- mode, shell, focus, dualPane, bootOk
 BGUI.reload()        -- hot-reload normal (preserva helpers se bootstrap falhar)
 ```
 
-`BGUI.reload` / `BGUI.status` são redefinidos no início do bootstrap (`Debug.lua`). Se `BGUI.reload` for nil, chamar a global **`BGUI_rebootstrap()`**.
+Preferir **`BGUI_status()` / `BGUI_reload()` / `BGUI_rebootstrap()`** no console — não morrem se a tabela `BGUI` ficar half-dead. `BGUI.reload` / `BGUI.status` são redefinidos no início do bootstrap (`Debug.lua`).
 
 - **Basta reload/rebootstrap:** mudanças de lógica `shared/` / `client/` Lua na maioria dos casos.
 - **Ainda precisa menu → Load (ou restart):** alterações pesadas em classes ISUI (`derive`), `mod.info`, assets novos, ou se o console mostrar `[BGUI] bootstrap failed`.

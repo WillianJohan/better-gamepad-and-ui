@@ -77,9 +77,22 @@ end
 
 local function isBguiPackageKey(k)
   if type(k) ~= "string" then return false end
-  if string.sub(k, 1, 5) == "BGUI/" then return true end
-  if string.sub(k, 1, 5) == "BGUI." then return true end
+  -- Kahlua/PZ às vezes usa \, caminho completo, ou prefixo media/lua/...
+  local n = string.gsub(k, "\\", "/")
+  n = string.lower(n)
+  if string.find(n, "/bgui/", 1, true) then return true end
+  if string.find(n, "/bgui.", 1, true) then return true end
+  if string.sub(n, 1, 5) == "bgui/" then return true end
+  if string.sub(n, 1, 5) == "bgui." then return true end
   return false
+end
+
+local function forceUnloadBootstrap()
+  if not package or not package.loaded then return end
+  package.loaded["BGUI/Debug"] = nil
+  package.loaded["BGUI/bootstrap"] = nil
+  package.loaded["BGUI\\Debug"] = nil
+  package.loaded["BGUI\\bootstrap"] = nil
 end
 
 --- Nil em package.loaded["BGUI/…"] pra o próximo require reler o disco.
@@ -94,6 +107,7 @@ function BGUI.clearLoadedModules()
   for i = 1, #keys do
     package.loaded[keys[i]] = nil
   end
+  forceUnloadBootstrap()
 end
 
 local function wipeBguiTable(keep)
@@ -168,11 +182,9 @@ function BGUI_rebootstrap()
       if isBguiPackageKey(k) then keys[#keys + 1] = k end
     end
     for i = 1, #keys do package.loaded[keys[i]] = nil end
-  end
-  -- Garante re-require mesmo se clearLoadedModules não existia.
-  if package and package.loaded then
-    package.loaded["BGUI/Debug"] = nil
-    package.loaded["BGUI/bootstrap"] = nil
+    forceUnloadBootstrap()
+  else
+    forceUnloadBootstrap()
   end
   local ok, err = pcall(function()
     require "BGUI/bootstrap"
@@ -185,10 +197,27 @@ function BGUI_rebootstrap()
   print("[BGUI] rebootstrap failed: " .. tostring(err or "no router"))
   -- Debug pode ter sido carregado a meio — tenta pelo menos repor helpers.
   pcall(function()
-    package.loaded["BGUI/Debug"] = nil
+    forceUnloadBootstrap()
     require "BGUI/Debug"
   end)
   return false
+end
+
+--- Entradas de console que sobrevivem a BGUI half-dead (preferir estas se status/reload sumirem).
+function BGUI_status()
+  if BGUI and type(BGUI.status) == "function" then
+    return BGUI.status()
+  end
+  print("[BGUI] status indisponível — rode: BGUI_rebootstrap()")
+  return nil
+end
+
+function BGUI_reload()
+  if BGUI and type(BGUI.reload) == "function" then
+    return BGUI.reload()
+  end
+  print("[BGUI] reload nil — caindo pra BGUI_rebootstrap()")
+  return BGUI_rebootstrap()
 end
 
 --- Fecha UI, desarma events, limpa módulos BGUI e reexecuta o bootstrap.
@@ -204,6 +233,7 @@ function BGUI.reload()
     if BGUI.closeOpenUi then BGUI.closeOpenUi() end
     if BGUI.disarmEvents then BGUI.disarmEvents() end
     if BGUI.clearLoadedModules then BGUI.clearLoadedModules() end
+    forceUnloadBootstrap()
     -- Mantém helpers de debug durante o require; bootstrap reatribui o resto.
     wipeBguiTable({
       reload = true,
