@@ -23,6 +23,19 @@ scripts/dev-sync.sh       # COPIA mod/ pra pasta de mods do jogo como STAGING
 - **Jogo:** Steam (Flatpak comum) em `~/Zomboid` ou `ZOMBOID_DIR`.
 - **Log:** `console.txt` na pasta de dados do Zomboid.
 
+## Hot-reload no jogo
+
+Após `scripts/dev-sync.sh`, no **console de debug** Lua do PZ:
+
+```lua
+BGUI.reload()
+```
+
+Fecha UI BGUI aberta, nil em `package.loaded` para chaves `BGUI/*`, rearma bootstrap (router/shell/events) e imprime `[BGUI] reload ok`. Idempotente se já estiver limpo; não exige joypad ativo.
+
+- **Basta reload:** mudanças de lógica `shared/` / `client/` Lua na maioria dos casos.
+- **Ainda precisa menu → Load (ou restart):** alterações pesadas em classes ISUI (`derive`), `mod.info`, assets novos, ou se o console mostrar `[BGUI] reload failed`.
+
 ## Desenvolvimento x lançado
 
 - **`main`** = o que está (ou vai estar) no Workshop / release.

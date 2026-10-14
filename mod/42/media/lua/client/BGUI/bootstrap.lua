@@ -1,4 +1,7 @@
 -- media/lua/client/BGUI/bootstrap.lua
+BGUI = BGUI or {}
+
+require "BGUI/Debug"
 require "BGUI/Strings_PT"
 require "BGUI/InputMode"
 require "BGUI/InputRouter"
@@ -86,10 +89,6 @@ local function onJoypadButtonPressed(button, joypadData)
   end
 end
 
-if Events.OnJoypadButtonPressed then
-  Events.OnJoypadButtonPressed.Add(onJoypadButtonPressed)
-end
-
 local function onTickHub()
   if BGUI.GamepadShell and BGUI.GamepadShell.tickHub then
     BGUI.GamepadShell:tickHub(0)
@@ -99,10 +98,27 @@ local function onTickHub()
   end
 end
 
+BGUI._handlers = {
+  joypadButton = onJoypadButtonPressed,
+  tickHub = onTickHub,
+  joypadActivate = onJoypadActivate,
+  keyPressed = onKeyPressed,
+}
+
+if Events and Events.OnJoypadButtonPressed then
+  Events.OnJoypadButtonPressed.Add(onJoypadButtonPressed)
+end
+
 if Events and Events.OnTick then
   Events.OnTick.Add(onTickHub)
 end
 
-Events.OnJoypadActivate.Add(onJoypadActivate)
-Events.OnKeyStartPressed.Add(onKeyPressed)
+if Events and Events.OnJoypadActivate then
+  Events.OnJoypadActivate.Add(onJoypadActivate)
+end
+
+if Events and Events.OnKeyStartPressed then
+  Events.OnKeyStartPressed.Add(onKeyPressed)
+end
+
 print("[BGUI] dual-UI router armed")
