@@ -1,4 +1,4 @@
-# The Last of Z — GamePad
+# Better Gamepad and UI
 
 Mod Lua-first para **Project Zomboid Build 42** que troca a experiência de UI/input no controle: shell gamepad próprio, inventário dual-pane (Abas), hub radial com satélites whitelist, ButtonLegend e DualSense com fallback.
 

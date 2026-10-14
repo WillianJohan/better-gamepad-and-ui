@@ -1,6 +1,6 @@
 # Design: Mod GamePad / Inputs — Project Zomboid
 
-**Project:** The Last of Z  
+**Project:** Better Gamepad and UI  
 **Data:** 2026-10-14  
 **Status:** design do mod de gamepad (revisão pós-higiene de contexto)  
 **Produto:** mod Lua-first que **reescreve a experiência de input/UI no controle**, com suporte forte a **DualSense (PS5)**.

@@ -1,4 +1,4 @@
-# Mod GamePad / UI (The Last of Z) Implementation Plan
+# Better Gamepad and UI — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -105,11 +105,11 @@ mods/TheLastOfZ_Gamepad/
 - [ ] **Step 1: Criar `mod.info`**
 
 ```
-name=The Last of Z — GamePad
+name=Better Gamepad and UI
 id=TheLastOfZ_Gamepad
 description=UI e inputs no controle para Project Zomboid: shell gamepad, inventário dual-pane Abas, hub radial e DualSense com fallback.
 poster=
-author=The Last of Z
+author=Johan
 modversion=0.1.0
 versionMin=42.0
 ```
@@ -1716,7 +1716,7 @@ git commit -m "feat: DualSense hold feedback with safe fallback"
 - [ ] **Step 1: Escrever `DOD_V1.md`**
 
 ```markdown
-# DoD v1 — TheLastOfZ_Gamepad
+# DoD v1 — Better Gamepad and UI
 
 ## Harness
 - [ ] `cd mods/TheLastOfZ_Gamepad/tests && lua5.1 run_all.lua` → ALL PASSED

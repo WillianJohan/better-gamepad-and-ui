@@ -1,4 +1,4 @@
-# DoD v1 — TheLastOfZ_Gamepad
+# DoD v1 — Better Gamepad and UI
 
 ## Harness
 - [x] `./run-tests.sh (raiz do repo)` → ALL PASSED
