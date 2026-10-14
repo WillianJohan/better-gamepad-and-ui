@@ -27,15 +27,22 @@ local function dualSenseEnd(kind)
   end
 end
 
+local function hideInvPage(page)
+  if not page then return end
+  if page.setVisible then page:setVisible(false) end
+  if page.setIsVisible then page:setIsVisible(false) end
+  if page.removeFromUIManager then page:removeFromUIManager() end
+end
+
 function BGUI.GamepadShell:hideVanillaInventory(playerNum)
-  if not getPlayerInventory then return end
   local n = getNumActivePlayers and getNumActivePlayers() or 1
   for i = 0, n - 1 do
     if playerNum == nil or i == playerNum then
-      local page = getPlayerInventory(i)
-      if page then
-        if page.setVisible then page:setVisible(false) end
-        if page.removeFromUIManager then page:removeFromUIManager() end
+      if getPlayerInventory then
+        hideInvPage(getPlayerInventory(i))
+      end
+      if getPlayerLoot then
+        hideInvPage(getPlayerLoot(i))
       end
     end
   end
@@ -111,6 +118,10 @@ end
 
 function BGUI.GamepadShell:_confirmHeld(playerNum)
   return self:_buttonHeld(playerNum, "_testConfirmHeld", "AButton", 0, "isAPressed")
+end
+
+function BGUI.GamepadShell:_yHeld(playerNum)
+  return self:_buttonHeld(playerNum, "_testYHeld", "YButton", 3, "isYPressed")
 end
 
 function BGUI.GamepadShell:_satHoldReleased(playerNum)

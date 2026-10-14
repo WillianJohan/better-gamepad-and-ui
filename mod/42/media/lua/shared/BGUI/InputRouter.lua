@@ -1,4 +1,8 @@
 BGUI = BGUI or {}
+-- Após wipe de BGUI, package.loaded pode ter InputMode cacheado sem repor a tabela.
+if not BGUI.InputMode and package and package.loaded then
+  package.loaded["BGUI/InputMode"] = nil
+end
 require "BGUI/InputMode"
 BGUI.InputRouter = BGUI.InputRouter or {}
 

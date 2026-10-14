@@ -29,20 +29,30 @@ Versão do mod: **0.1.0** (`mod/42/mod.info`).
 3. No jogo: Mods → ative **[STAGING] Better Gamepad and UI**.
 4. Reinicie o jogo após a primeira sync (ou quando mudar `mod.info` / estrutura).
 
-### Hot-reload (`BGUI.reload()`)
+### Console checks (Johan)
 
-Pra iterar sem fechar o jogo:
+Após `scripts/dev-sync.sh`, no **console de debug** Lua:
 
-1. `scripts/dev-sync.sh` — copia o Lua atualizado pro staging.
-2. No jogo, abra o **console de debug** Lua.
-3. Rode: `BGUI.reload()`
+```lua
+BGUI_rebootstrap()
+BGUI.status()
+```
 
-Isso fecha a UI BGUI aberta, limpa `package.loaded` dos módulos `BGUI/*`, reexecuta o bootstrap (router/shell/events) e imprime `[BGUI] reload ok`.
+Esperado em `BGUI.status()`: `bootOk=yes`, `hasReload=yes`, `hasRouter=yes`, e com pad ativo `mode=gamepad` / `activeShell=gamepad`.
 
-| Reload basta | Ainda precisa menu → Load (ou restart) |
-|--------------|----------------------------------------|
+Hot-reload (quando `BGUI.reload` ainda existe):
+
+```lua
+BGUI.reload()
+BGUI.status()
+```
+
+Se `BGUI.reload()` der *Object tried to call nil*, a tabela ficou half-dead — use **`BGUI_rebootstrap()`** (global) ou reinicie o save. Isso limpa `package.loaded` dos módulos `BGUI/*`, reexecuta o bootstrap e redefine `reload`/`status`/`_router`.
+
+| Reload / rebootstrap basta | Ainda precisa menu → Load (ou restart) |
+|----------------------------|----------------------------------------|
 | Lógica em `shared/` e a maior parte do `client/` Lua | Mudanças profundas em classes ISUI (`derive` / metatables já cacheadas) |
-| Handlers, router, radiais, dual-pane (reabrir depois) | Troca de `mod.info`, assets novos, ou reload falhou no console |
+| Handlers, router, radiais, dual-pane (reabrir depois) | Troca de `mod.info`, assets novos, ou bootstrap falhou no console |
 
 Seguro com joypad inativo ou UI já fechada (não crasha).
 

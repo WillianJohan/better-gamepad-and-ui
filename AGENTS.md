@@ -28,13 +28,15 @@ scripts/dev-sync.sh       # COPIA mod/ pra pasta de mods do jogo como STAGING
 Após `scripts/dev-sync.sh`, no **console de debug** Lua do PZ:
 
 ```lua
-BGUI.reload()
+BGUI_rebootstrap()   -- recuperação se reload sumiu / tabela half-dead
+BGUI.status()        -- mode, shell, focus, dualPane, bootOk
+BGUI.reload()        -- hot-reload normal (preserva helpers se bootstrap falhar)
 ```
 
-Fecha UI BGUI aberta, nil em `package.loaded` para chaves `BGUI/*`, rearma bootstrap (router/shell/events) e imprime `[BGUI] reload ok`. Idempotente se já estiver limpo; não exige joypad ativo.
+`BGUI.reload` / `BGUI.status` são redefinidos no início do bootstrap (`Debug.lua`). Se `BGUI.reload` for nil, chamar a global **`BGUI_rebootstrap()`**.
 
-- **Basta reload:** mudanças de lógica `shared/` / `client/` Lua na maioria dos casos.
-- **Ainda precisa menu → Load (ou restart):** alterações pesadas em classes ISUI (`derive`), `mod.info`, assets novos, ou se o console mostrar `[BGUI] reload failed`.
+- **Basta reload/rebootstrap:** mudanças de lógica `shared/` / `client/` Lua na maioria dos casos.
+- **Ainda precisa menu → Load (ou restart):** alterações pesadas em classes ISUI (`derive`), `mod.info`, assets novos, ou se o console mostrar `[BGUI] bootstrap failed`.
 
 ## Desenvolvimento x lançado
 
