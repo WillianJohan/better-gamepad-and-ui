@@ -1,6 +1,6 @@
--- media/lua/shared/TLOZ/CategoryFilter.lua
-TLOZ = TLOZ or {}
-require "TLOZ/Strings_PT"
+-- media/lua/shared/BGUI/CategoryFilter.lua
+BGUI = BGUI or {}
+require "BGUI/Strings_PT"
 
 local ORDER = {
   "weapons", "ammo", "clothes", "food", "water",
@@ -61,17 +61,17 @@ end
 
 function CategoryFilter.label(categoryId)
   local map = {
-    weapons = TLOZ.Strings.categoryWeapons,
-    ammo = TLOZ.Strings.categoryAmmo,
-    clothes = TLOZ.Strings.categoryClothes,
-    food = TLOZ.Strings.categoryFood,
-    water = TLOZ.Strings.categoryWater,
-    medical = TLOZ.Strings.categoryMedical,
-    containers = TLOZ.Strings.categoryContainers,
-    tools = TLOZ.Strings.categoryTools,
-    misc = TLOZ.Strings.categoryMisc,
+    weapons = BGUI.Strings.categoryWeapons,
+    ammo = BGUI.Strings.categoryAmmo,
+    clothes = BGUI.Strings.categoryClothes,
+    food = BGUI.Strings.categoryFood,
+    water = BGUI.Strings.categoryWater,
+    medical = BGUI.Strings.categoryMedical,
+    containers = BGUI.Strings.categoryContainers,
+    tools = BGUI.Strings.categoryTools,
+    misc = BGUI.Strings.categoryMisc,
   }
   return map[categoryId] or categoryId
 end
 
-TLOZ.CategoryFilter = CategoryFilter
+BGUI.CategoryFilter = CategoryFilter

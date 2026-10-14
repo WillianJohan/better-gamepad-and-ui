@@ -25,11 +25,11 @@ Versão do mod: **0.1.0** (`mod/42/mod.info`).
 ## Instalação (dev)
 
 1. Clone este repo.
-2. `scripts/dev-sync.sh` — copia `mod/` para `Zomboid/mods/TheLastOfZ_Gamepad_Staging` (defina `ZOMBOID_DIR` se não for o padrão Flatpak/`~/Zomboid`).
+2. `scripts/dev-sync.sh` — copia `mod/` para `Zomboid/mods/BetterGamepadAndUI_Staging` (defina `ZOMBOID_DIR` se não for o padrão Flatpak/`~/Zomboid`).
 3. No jogo: Mods → ative **[STAGING] Better Gamepad and UI**.
 4. Reinicie o jogo após cada sync.
 
-Para instalar “oficial” (sem staging), copie `mod/` para `Zomboid/mods/TheLastOfZ_Gamepad` (pasta com `42/` e `common/`).
+Para instalar “oficial” (sem staging), copie `mod/` para `Zomboid/mods/BetterGamepadAndUI` (pasta com `42/` e `common/`).
 
 ## Testes
 

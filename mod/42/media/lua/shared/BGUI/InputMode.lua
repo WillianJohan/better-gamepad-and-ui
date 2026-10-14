@@ -1,5 +1,5 @@
-TLOZ = TLOZ or {}
-TLOZ.InputMode = {
+BGUI = BGUI or {}
+BGUI.InputMode = {
   KBM = "kbm",
   GAMEPAD = "gamepad",
 }

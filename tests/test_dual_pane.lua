@@ -43,16 +43,16 @@ function getSpecificPlayer()
   return nil
 end
 
-TLOZ = TLOZ or {}
-TLOZ._focus = TLOZ.FocusStack and TLOZ.FocusStack.new() or { push = function() end, pop = function() end, peek = function() return "dualpane" end }
-TLOZ.GamepadShell = { hideVanillaInventory = function() end }
+BGUI = BGUI or {}
+BGUI._focus = BGUI.FocusStack and BGUI.FocusStack.new() or { push = function() end, pop = function() end, peek = function() return "dualpane" end }
+BGUI.GamepadShell = { hideVanillaInventory = function() end }
 
-require "TLOZ/FocusStack"
-require "TLOZ/CategoryFilter"
-require "TLOZ/InventoryListPane"
-require "TLOZ/DualPaneInventory"
+require "BGUI/FocusStack"
+require "BGUI/CategoryFilter"
+require "BGUI/InventoryListPane"
+require "BGUI/DualPaneInventory"
 
-local pane = TLOZ.InventoryListPane:new(0, 0, 200, 300, "VOCÊ")
+local pane = BGUI.InventoryListPane:new(0, 0, 200, 300, "VOCÊ")
 pane:setRows({ { label = "a" }, { label = "b" }, { label = "c" } })
 pane:moveSelection(1)
 assert(pane.selected == 2, "move down")
@@ -62,7 +62,7 @@ assert(pane.selected == 1, "wrap selection")
 pane:setRows({ { label = "only" } })
 assert(pane.selected == 1, "clamp selection after shrink")
 
-local dp = TLOZ.DualPaneInventory:new(0)
+local dp = BGUI.DualPaneInventory:new(0)
 assert(dp.side == "you" and dp.youTab == "equipped", "initial state")
 dp:onSwapSide()
 assert(dp.side == "reach", "swap to reach")
@@ -72,7 +72,7 @@ dp:onSwapSide()
 dp:onTabOrCycle(1)
 assert(dp.youTab == "backpack", "L1/R1 toggles equipped/backpack on you side")
 dp:onCycleCategory(1)
-assert(dp.categoryId ~= "weapons" or TLOZ.CategoryFilter.cycle("weapons", 1) == dp.categoryId, "category cycles on backpack")
+assert(dp.categoryId ~= "weapons" or BGUI.CategoryFilter.cycle("weapons", 1) == dp.categoryId, "category cycles on backpack")
 dp.youTab = "equipped"
 local before = dp.categoryId
 dp:onCycleCategory(1)

@@ -1,10 +1,10 @@
-TLOZ = TLOZ or {}
-TLOZ.FocusStack = TLOZ.FocusStack or {}
+BGUI = BGUI or {}
+BGUI.FocusStack = BGUI.FocusStack or {}
 
 local Stack = {}
 Stack.__index = Stack
 
-function TLOZ.FocusStack.new()
+function BGUI.FocusStack.new()
   return setmetatable({ _items = {} }, Stack)
 end
 

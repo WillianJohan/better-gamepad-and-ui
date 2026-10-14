@@ -1,12 +1,12 @@
--- media/lua/client/TLOZ/RadialHub.lua
-require "TLOZ/RadialSlice"
-require "TLOZ/Strings_PT"
-require "TLOZ/DualSenseHooks"
+-- media/lua/client/BGUI/RadialHub.lua
+require "BGUI/RadialSlice"
+require "BGUI/Strings_PT"
+require "BGUI/DualSenseHooks"
 
-TLOZ = TLOZ or {}
-TLOZ.RadialHub = ISPanel:derive("TLOZ.RadialHub")
+BGUI = BGUI or {}
+BGUI.RadialHub = ISPanel:derive("BGUI.RadialHub")
 
-function TLOZ.RadialHub:new()
+function BGUI.RadialHub:new()
   local sw, sh = getCore():getScreenWidth(), getCore():getScreenHeight()
   local size = 280
   local o = ISPanel:new(math.floor((sw - size) / 2), math.floor((sh - size) / 2), size, size)
@@ -18,8 +18,8 @@ function TLOZ.RadialHub:new()
   return o
 end
 
-function TLOZ.RadialHub:_candidates()
-  local S = TLOZ.Strings
+function BGUI.RadialHub:_candidates()
+  local S = BGUI.Strings
   return {
     { id = "inventory", label = S.radialInventory, enabled = true },
     { id = "health", label = S.radialHealth, enabled = true },
@@ -31,12 +31,12 @@ function TLOZ.RadialHub:_candidates()
   }
 end
 
-function TLOZ.RadialHub:open()
-  self.slices = TLOZ.RadialSlice.build(self:_candidates())
+function BGUI.RadialHub:open()
+  self.slices = BGUI.RadialSlice.build(self:_candidates())
   self.selected = 1
   self:addToUIManager()
-  if TLOZ._focus then TLOZ._focus:push("radial_hub") end
-  if TLOZ._legend then TLOZ._legend:setContext("radial_open", TLOZ._glyphFamily or "xbox") end
+  if BGUI._focus then BGUI._focus:push("radial_hub") end
+  if BGUI._legend then BGUI._legend:setContext("radial_open", BGUI._glyphFamily or "xbox") end
   if JoypadState and JoypadState.players then
     local idx = (self.playerNum or 0) + 1
     if JoypadState.players[idx] then
@@ -45,14 +45,14 @@ function TLOZ.RadialHub:open()
   end
 end
 
-function TLOZ.RadialHub:close()
-  if TLOZ._hubDualSenseActive and TLOZ.DualSenseHooks then
-    TLOZ.DualSenseHooks.onHoldEnd("hub")
-    TLOZ._hubDualSenseActive = false
+function BGUI.RadialHub:close()
+  if BGUI._hubDualSenseActive and BGUI.DualSenseHooks then
+    BGUI.DualSenseHooks.onHoldEnd("hub")
+    BGUI._hubDualSenseActive = false
   end
   self:removeFromUIManager()
-  if TLOZ._focus and TLOZ._focus:peek() == "radial_hub" then TLOZ._focus:pop() end
-  if TLOZ._legend then TLOZ._legend:setContext("world", TLOZ._glyphFamily or "xbox") end
+  if BGUI._focus and BGUI._focus:peek() == "radial_hub" then BGUI._focus:pop() end
+  if BGUI._legend then BGUI._legend:setContext("world", BGUI._glyphFamily or "xbox") end
   if JoypadState and JoypadState.players then
     local idx = (self.playerNum or 0) + 1
     if JoypadState.players[idx] and JoypadState.players[idx].focus == self then
@@ -61,7 +61,7 @@ function TLOZ.RadialHub:close()
   end
 end
 
-function TLOZ.RadialHub:setStickDirection(angleRad)
+function BGUI.RadialHub:setStickDirection(angleRad)
   if #self.slices == 0 then return end
   local n = #self.slices
   local sector = (math.pi * 2) / n
@@ -94,7 +94,7 @@ local function viewName(key, fallback)
   return fallback
 end
 
-function TLOZ.RadialHub:_openVanillaSlice(sliceId, player)
+function BGUI.RadialHub:_openVanillaSlice(sliceId, player)
   if not player then return end
   local playerNum = player.getPlayerNum and player:getPlayerNum() or 0
 
@@ -159,15 +159,15 @@ function TLOZ.RadialHub:_openVanillaSlice(sliceId, player)
   end
 end
 
-function TLOZ.RadialHub:confirm()
+function BGUI.RadialHub:confirm()
   local slice = self.slices[self.selected]
   self:close()
   if not slice then return end
   if slice.id == "inventory" then
-    if TLOZ.openDualPane then TLOZ.openDualPane(self.playerNum or 0) end
+    if BGUI.openDualPane then BGUI.openDualPane(self.playerNum or 0) end
   elseif slice.id == "build" then
-    if TLOZ.RadialSatellites and TLOZ.RadialSatellites.openBuild then
-      TLOZ.RadialSatellites.openBuild(self.playerNum or 0)
+    if BGUI.RadialSatellites and BGUI.RadialSatellites.openBuild then
+      BGUI.RadialSatellites.openBuild(self.playerNum or 0)
     end
   else
     local player = getSpecificPlayer(self.playerNum or 0)
@@ -175,7 +175,7 @@ function TLOZ.RadialHub:confirm()
   end
 end
 
-function TLOZ.RadialHub:prerender()
+function BGUI.RadialHub:prerender()
   self:drawRect(0, 0, self.width, self.height, 0.7, 0.02, 0.02, 0.02)
   local cx, cy = self.width / 2, self.height / 2
   for i = 1, #self.slices do
@@ -192,7 +192,7 @@ local function joyButton(name, fallback)
   return fallback
 end
 
-function TLOZ.RadialHub:onJoypadDown(button)
+function BGUI.RadialHub:onJoypadDown(button)
   local B = joyButton("BButton", 1)
   local A = joyButton("AButton", 0)
   if button == B then

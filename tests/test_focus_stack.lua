@@ -1,8 +1,8 @@
 -- tests/test_focus_stack.lua
 package.path = package.path .. ";../media/lua/shared/?.lua"
-require "TLOZ/FocusStack"
+require "BGUI/FocusStack"
 
-local s = TLOZ.FocusStack.new()
+local s = BGUI.FocusStack.new()
 assert(s:depth() == 0)
 assert(s:peek() == nil)
 assert(s:pop() == nil)

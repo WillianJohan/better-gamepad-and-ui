@@ -1,15 +1,15 @@
--- media/lua/client/TLOZ/RadialSatellites.lua
-require "TLOZ/RadialSlice"
-require "TLOZ/Strings_PT"
-require "TLOZ/RadialHub"
+-- media/lua/client/BGUI/RadialSatellites.lua
+require "BGUI/RadialSlice"
+require "BGUI/Strings_PT"
+require "BGUI/RadialHub"
 
-TLOZ = TLOZ or {}
-TLOZ.RadialSatellites = {}
+BGUI = BGUI or {}
+BGUI.RadialSatellites = {}
 
-function TLOZ.RadialSatellites.buildItemSlices(item)
-  local S = TLOZ.Strings
+function BGUI.RadialSatellites.buildItemSlices(item)
+  local S = BGUI.Strings
   local canEat = item and item.isFood and item:isFood()
-  return TLOZ.RadialSlice.build({
+  return BGUI.RadialSlice.build({
     { id = "eat", label = S.actionEat, enabled = canEat },
     { id = "equip", label = S.actionEquip, enabled = item ~= nil },
     { id = "drop", label = S.actionDrop, enabled = item ~= nil },
@@ -17,7 +17,7 @@ function TLOZ.RadialSatellites.buildItemSlices(item)
   })
 end
 
-function TLOZ.RadialSatellites.scanWorldFlags(square)
+function BGUI.RadialSatellites.scanWorldFlags(square)
   local hasDoor, hasWindow, hasBody, hasStove = false, false, false, false
   if square then
     for i = 0, 3 do
@@ -28,9 +28,9 @@ function TLOZ.RadialSatellites.scanWorldFlags(square)
   return hasDoor, hasWindow, hasBody, hasStove
 end
 
-function TLOZ.RadialSatellites.buildWorldSlices(square)
-  local hasDoor, hasWindow, hasBody, hasStove = TLOZ.RadialSatellites.scanWorldFlags(square)
-  return TLOZ.RadialSlice.build({
+function BGUI.RadialSatellites.buildWorldSlices(square)
+  local hasDoor, hasWindow, hasBody, hasStove = BGUI.RadialSatellites.scanWorldFlags(square)
+  return BGUI.RadialSlice.build({
     { id = "door", label = "Porta", enabled = hasDoor },
     { id = "window", label = "Janela", enabled = hasWindow },
     { id = "body", label = "Corpo", enabled = hasBody },
@@ -38,8 +38,8 @@ function TLOZ.RadialSatellites.buildWorldSlices(square)
   })
 end
 
-function TLOZ.RadialSatellites.buildEquipSlices()
-  return TLOZ.RadialSlice.build({
+function BGUI.RadialSatellites.buildEquipSlices()
+  return BGUI.RadialSlice.build({
     { id = "primary", label = "Mão primária", enabled = true },
     { id = "secondary", label = "Mão secundária", enabled = true },
     { id = "holster", label = "Arma rápida", enabled = true },
@@ -47,20 +47,20 @@ function TLOZ.RadialSatellites.buildEquipSlices()
 end
 
 local function closeSatPanel(panel)
-  if TLOZ._satHoldKind == "lt" and TLOZ._itemDualSenseActive and TLOZ.DualSenseHooks then
-    TLOZ.DualSenseHooks.onHoldEnd("item_radial")
-    TLOZ._itemDualSenseActive = false
+  if BGUI._satHoldKind == "lt" and BGUI._itemDualSenseActive and BGUI.DualSenseHooks then
+    BGUI.DualSenseHooks.onHoldEnd("item_radial")
+    BGUI._itemDualSenseActive = false
   end
   panel:removeFromUIManager()
-  if TLOZ._focus and TLOZ._focus:peek() == "radial_sat" then
-    TLOZ._focus:pop()
+  if BGUI._focus and BGUI._focus:peek() == "radial_sat" then
+    BGUI._focus:pop()
   end
-  if TLOZ._legend then
+  if BGUI._legend then
     local ctx = "world"
-    if TLOZ._focus and TLOZ._focus:peek() == "dualpane" and TLOZ._dualPane then
-      ctx = (TLOZ._dualPane.side == "reach") and "dualpane_reach" or "dualpane_you"
+    if BGUI._focus and BGUI._focus:peek() == "dualpane" and BGUI._dualPane then
+      ctx = (BGUI._dualPane.side == "reach") and "dualpane_reach" or "dualpane_you"
     end
-    TLOZ._legend:setContext(ctx, TLOZ._glyphFamily or "xbox")
+    BGUI._legend:setContext(ctx, BGUI._glyphFamily or "xbox")
   end
   if JoypadState and JoypadState.players and panel.playerNum ~= nil then
     local idx = panel.playerNum + 1
@@ -68,15 +68,15 @@ local function closeSatPanel(panel)
       JoypadState.players[idx].focus = nil
     end
   end
-  if TLOZ._satPanel == panel then
-    TLOZ._satPanel = nil
-    TLOZ._satHoldKind = nil
+  if BGUI._satPanel == panel then
+    BGUI._satPanel = nil
+    BGUI._satHoldKind = nil
   end
 end
 
 local function openSlicePanel(slices, onPick, holdKind, playerNum)
   if not slices or #slices == 0 then return end
-  local panel = TLOZ.RadialHub:new()
+  local panel = BGUI.RadialHub:new()
   panel.playerNum = playerNum or 0
   panel.slices = slices
   panel.selected = 1
@@ -89,22 +89,22 @@ local function openSlicePanel(slices, onPick, holdKind, playerNum)
     if s and onPick then onPick(s.id) end
   end
   panel:addToUIManager()
-  if TLOZ._focus then TLOZ._focus:push("radial_sat") end
-  if TLOZ._legend then TLOZ._legend:setContext("radial_open", TLOZ._glyphFamily or "xbox") end
+  if BGUI._focus then BGUI._focus:push("radial_sat") end
+  if BGUI._legend then BGUI._legend:setContext("radial_open", BGUI._glyphFamily or "xbox") end
   if JoypadState and JoypadState.players then
     local idx = panel.playerNum + 1
     if JoypadState.players[idx] then
       JoypadState.players[idx].focus = panel
     end
   end
-  TLOZ._satPanel = panel
-  TLOZ._satHoldKind = holdKind
+  BGUI._satPanel = panel
+  BGUI._satHoldKind = holdKind
 end
 
-function TLOZ.RadialSatellites.openItem(item, playerNum)
+function BGUI.RadialSatellites.openItem(item, playerNum)
   if not item then return end
-  local S = TLOZ.Strings
-  local slices = TLOZ.RadialSatellites.buildItemSlices(item)
+  local S = BGUI.Strings
+  local slices = BGUI.RadialSatellites.buildItemSlices(item)
   openSlicePanel(slices, function(id)
     local player = getSpecificPlayer(playerNum or 0)
     if not player or not item then return end
@@ -119,7 +119,7 @@ function TLOZ.RadialSatellites.openItem(item, playerNum)
       if sq then sq:AddWorldInventoryItem(item, 0, 0, 0) end
       player:getInventory():Remove(item)
     end
-    if TLOZ._dualPane then TLOZ._dualPane:refresh() end
+    if BGUI._dualPane then BGUI._dualPane:refresh() end
   end, "lt", playerNum)
 end
 
@@ -128,18 +128,18 @@ local function playerNumOf(player, fallback)
   return fallback or 0
 end
 
-function TLOZ.RadialSatellites.openWorld(square, player)
+function BGUI.RadialSatellites.openWorld(square, player)
   if not player then return end
   local sq = square or player:getCurrentSquare()
-  local slices = TLOZ.RadialSatellites.buildWorldSlices(sq)
+  local slices = BGUI.RadialSatellites.buildWorldSlices(sq)
   openSlicePanel(slices, function(_id)
     -- despacho vanilla (porta/janela/etc.) numa task futura
   end, "confirm", playerNumOf(player))
 end
 
-function TLOZ.RadialSatellites.openEquipQuick(player)
+function BGUI.RadialSatellites.openEquipQuick(player)
   if not player then return end
-  local slices = TLOZ.RadialSatellites.buildEquipSlices()
+  local slices = BGUI.RadialSatellites.buildEquipSlices()
   openSlicePanel(slices, function(_id)
     -- troca rápida: lista curta (não browser radial de categorias)
   end, "rt", playerNumOf(player))
@@ -152,8 +152,8 @@ local BUILD_QUERY = {
   defense = "Defense",
 }
 
-function TLOZ.RadialSatellites.buildBuildSlices()
-  return TLOZ.RadialSlice.build({
+function BGUI.RadialSatellites.buildBuildSlices()
+  return BGUI.RadialSlice.build({
     { id = "floor", label = "Piso", enabled = true },
     { id = "wall", label = "Parede", enabled = true },
     { id = "furniture", label = "Móveis", enabled = true },
@@ -182,16 +182,16 @@ local function openBuildWindow(player, query)
   end
 end
 
-function TLOZ.RadialSatellites.openBuild(playerNum)
+function BGUI.RadialSatellites.openBuild(playerNum)
   playerNum = playerNum or 0
-  local slices = TLOZ.RadialSatellites.buildBuildSlices()
+  local slices = BGUI.RadialSatellites.buildBuildSlices()
   openSlicePanel(slices, function(id)
     local player = getSpecificPlayer(playerNum)
     openBuildWindow(player, BUILD_QUERY[id] or id)
   end, "confirm", playerNum)
 end
 
-function TLOZ.RadialSatellites.findVehicle(player)
+function BGUI.RadialSatellites.findVehicle(player)
   if not player then return nil end
   local v = player.getVehicle and player:getVehicle() or nil
   if v then return v end
@@ -201,13 +201,13 @@ function TLOZ.RadialSatellites.findVehicle(player)
   return nil
 end
 
-function TLOZ.RadialSatellites.canUseVehicleShortcut(player)
-  return TLOZ.RadialSatellites.findVehicle(player) ~= nil
+function BGUI.RadialSatellites.canUseVehicleShortcut(player)
+  return BGUI.RadialSatellites.findVehicle(player) ~= nil
 end
 
-function TLOZ.RadialSatellites.buildVehicleSlices(player)
+function BGUI.RadialSatellites.buildVehicleSlices(player)
   if not player then return {} end
-  local vehicle = TLOZ.RadialSatellites.findVehicle(player)
+  local vehicle = BGUI.RadialSatellites.findVehicle(player)
   local inside = player.getVehicle and player:getVehicle() ~= nil
   local near = vehicle ~= nil
   local hasHood = false
@@ -216,7 +216,7 @@ function TLOZ.RadialSatellites.buildVehicleSlices(player)
     hasHood = vehicle:getPartById("EngineDoor") ~= nil
     hasTrunk = vehicle:getPartById("TrunkDoor") ~= nil
   end
-  return TLOZ.RadialSlice.build({
+  return BGUI.RadialSlice.build({
     { id = "enter", label = "Entrar", enabled = near and not inside },
     { id = "exit", label = "Sair", enabled = inside },
     { id = "hood", label = "Capô", enabled = near and hasHood },
@@ -226,7 +226,7 @@ end
 
 local function dispatchVehicle(player, id)
   if not player or not ISVehicleMenu then return end
-  local vehicle = TLOZ.RadialSatellites.findVehicle(player)
+  local vehicle = BGUI.RadialSatellites.findVehicle(player)
   if not vehicle then return end
   if id == "enter" and ISVehicleMenu.processEnter then
     ISVehicleMenu.processEnter(player, vehicle, 0)
@@ -245,9 +245,9 @@ local function dispatchVehicle(player, id)
   end
 end
 
-function TLOZ.RadialSatellites.openVehicle(player)
+function BGUI.RadialSatellites.openVehicle(player)
   if not player then return end
-  local slices = TLOZ.RadialSatellites.buildVehicleSlices(player)
+  local slices = BGUI.RadialSatellites.buildVehicleSlices(player)
   openSlicePanel(slices, function(id)
     dispatchVehicle(player, id)
   end, "confirm", playerNumOf(player))

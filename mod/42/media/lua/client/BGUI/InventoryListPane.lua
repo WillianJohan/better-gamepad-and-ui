@@ -1,11 +1,11 @@
--- media/lua/client/TLOZ/InventoryListPane.lua
-require "TLOZ/Strings_PT"
-require "TLOZ/CategoryFilter"
+-- media/lua/client/BGUI/InventoryListPane.lua
+require "BGUI/Strings_PT"
+require "BGUI/CategoryFilter"
 
-TLOZ = TLOZ or {}
-TLOZ.InventoryListPane = ISPanel:derive("TLOZ.InventoryListPane")
+BGUI = BGUI or {}
+BGUI.InventoryListPane = ISPanel:derive("BGUI.InventoryListPane")
 
-function TLOZ.InventoryListPane:new(x, y, w, h, title)
+function BGUI.InventoryListPane:new(x, y, w, h, title)
   local o = ISPanel:new(x, y, w, h)
   setmetatable(o, self)
   self.__index = self
@@ -18,7 +18,7 @@ function TLOZ.InventoryListPane:new(x, y, w, h, title)
   return o
 end
 
-function TLOZ.InventoryListPane:setRows(rows)
+function BGUI.InventoryListPane:setRows(rows)
   self.rows = rows or {}
   if self.selected > #self.rows then
     self.selected = math.max(1, #self.rows)
@@ -28,23 +28,23 @@ function TLOZ.InventoryListPane:setRows(rows)
   end
 end
 
-function TLOZ.InventoryListPane:moveSelection(delta)
+function BGUI.InventoryListPane:moveSelection(delta)
   if #self.rows == 0 then return end
   self.selected = ((self.selected - 1 + delta) % #self.rows) + 1
 end
 
-function TLOZ.InventoryListPane:getSelected()
+function BGUI.InventoryListPane:getSelected()
   return self.rows[self.selected]
 end
 
-function TLOZ.InventoryListPane:prerender()
+function BGUI.InventoryListPane:prerender()
   self:drawRect(0, 0, self.width, self.height, 0.85, 0.05, 0.05, 0.05)
   self:drawText(self.title, 8, 6, 1, 1, 1, 1, UIFont.Medium)
   if self.capacityText ~= "" then
-    self:drawText(TLOZ.Strings.capacity .. ": " .. self.capacityText, 8, 28, 0.8, 0.8, 0.8, 1, UIFont.Small)
+    self:drawText(BGUI.Strings.capacity .. ": " .. self.capacityText, 8, 28, 0.8, 0.8, 0.8, 1, UIFont.Small)
   end
   if self.showCategory then
-    self:drawText(TLOZ.CategoryFilter.label(self.categoryId), 8, 46, 0.9, 0.9, 0.6, 1, UIFont.Small)
+    self:drawText(BGUI.CategoryFilter.label(self.categoryId), 8, 46, 0.9, 0.9, 0.6, 1, UIFont.Small)
   end
   local y = self.showCategory and 66 or 48
   for i = 1, #self.rows do

@@ -1,13 +1,13 @@
--- media/lua/client/TLOZ/DualPaneInventory.lua
-require "TLOZ/InventoryListPane"
-require "TLOZ/CategoryFilter"
-require "TLOZ/Strings_PT"
-require "TLOZ/DualSenseHooks"
+-- media/lua/client/BGUI/DualPaneInventory.lua
+require "BGUI/InventoryListPane"
+require "BGUI/CategoryFilter"
+require "BGUI/Strings_PT"
+require "BGUI/DualSenseHooks"
 
-TLOZ = TLOZ or {}
-TLOZ.DualPaneInventory = ISPanel:derive("TLOZ.DualPaneInventory")
+BGUI = BGUI or {}
+BGUI.DualPaneInventory = ISPanel:derive("BGUI.DualPaneInventory")
 
-function TLOZ.DualPaneInventory:new(playerNum)
+function BGUI.DualPaneInventory:new(playerNum)
   local sw, sh = getCore():getScreenWidth(), getCore():getScreenHeight()
   local w, h = math.floor(sw * 0.8), math.floor(sh * 0.7)
   local o = ISPanel:new(math.floor((sw - w) / 2), math.floor((sh - h) / 2), w, h)
@@ -22,24 +22,24 @@ function TLOZ.DualPaneInventory:new(playerNum)
   return o
 end
 
-function TLOZ.DualPaneInventory:open()
+function BGUI.DualPaneInventory:open()
   local half = math.floor(self.width / 2) - 8
-  self.youPane = TLOZ.InventoryListPane:new(8, 8, half, self.height - 16, TLOZ.Strings.you)
-  self.reachPane = TLOZ.InventoryListPane:new(half + 16, 8, half, self.height - 16, TLOZ.Strings.reach)
+  self.youPane = BGUI.InventoryListPane:new(8, 8, half, self.height - 16, BGUI.Strings.you)
+  self.reachPane = BGUI.InventoryListPane:new(half + 16, 8, half, self.height - 16, BGUI.Strings.reach)
   self.reachPane.showCategory = true
   self:addChild(self.youPane)
   self:addChild(self.reachPane)
   self:setVisible(true)
   self:refresh()
   self:addToUIManager()
-  if TLOZ.GamepadShell and TLOZ.GamepadShell.hideVanillaInventory then
-    TLOZ.GamepadShell:hideVanillaInventory(self.playerNum)
+  if BGUI.GamepadShell and BGUI.GamepadShell.hideVanillaInventory then
+    BGUI.GamepadShell:hideVanillaInventory(self.playerNum)
   end
-  if TLOZ._focus then
-    TLOZ._focus:push("dualpane")
+  if BGUI._focus then
+    BGUI._focus:push("dualpane")
   end
-  if TLOZ._legend then
-    TLOZ._legend:setContext("dualpane_you", TLOZ._glyphFamily or "xbox")
+  if BGUI._legend then
+    BGUI._legend:setContext("dualpane_you", BGUI._glyphFamily or "xbox")
   end
   if JoypadState and JoypadState.players then
     local idx = self.playerNum + 1
@@ -49,18 +49,18 @@ function TLOZ.DualPaneInventory:open()
   end
 end
 
-function TLOZ.DualPaneInventory:close()
-  if TLOZ._itemDualSenseActive and TLOZ.DualSenseHooks then
-    TLOZ.DualSenseHooks.onHoldEnd("item_radial")
-    TLOZ._itemDualSenseActive = false
+function BGUI.DualPaneInventory:close()
+  if BGUI._itemDualSenseActive and BGUI.DualSenseHooks then
+    BGUI.DualSenseHooks.onHoldEnd("item_radial")
+    BGUI._itemDualSenseActive = false
   end
   self:setVisible(false)
   self:removeFromUIManager()
-  if TLOZ._focus and TLOZ._focus:peek() == "dualpane" then
-    TLOZ._focus:pop()
+  if BGUI._focus and BGUI._focus:peek() == "dualpane" then
+    BGUI._focus:pop()
   end
-  if TLOZ._legend then
-    TLOZ._legend:setContext("world", TLOZ._glyphFamily or "xbox")
+  if BGUI._legend then
+    BGUI._legend:setContext("world", BGUI._glyphFamily or "xbox")
   end
   if JoypadState and JoypadState.players then
     local idx = self.playerNum + 1
@@ -70,12 +70,12 @@ function TLOZ.DualPaneInventory:close()
   end
 end
 
-function TLOZ.DualPaneInventory:refresh()
+function BGUI.DualPaneInventory:refresh()
   local player = getSpecificPlayer(self.playerNum)
   if not player then return end
   if self.youTab == "equipped" then
     self.youPane.showCategory = false
-    self.youPane.title = TLOZ.Strings.you .. " — " .. TLOZ.Strings.tabEquipped
+    self.youPane.title = BGUI.Strings.you .. " — " .. BGUI.Strings.tabEquipped
     local rows = {}
     local primary = player:getPrimaryHandItem()
     local secondary = player:getSecondaryHandItem()
@@ -93,23 +93,23 @@ function TLOZ.DualPaneInventory:refresh()
   else
     self.youPane.showCategory = true
     self.youPane.categoryId = self.categoryId
-    self.youPane.title = TLOZ.Strings.you .. " — " .. TLOZ.Strings.tabBackpack
+    self.youPane.title = BGUI.Strings.you .. " — " .. BGUI.Strings.tabBackpack
     local items = {}
     local inv = player:getInventory():getItems()
     for i = 0, inv:size() - 1 do
       local it = inv:get(i)
       items[#items + 1] = { type = it:getFullType(), label = it:getDisplayName(), item = it }
     end
-    self.youPane:setRows(TLOZ.CategoryFilter.filter(items, self.categoryId))
+    self.youPane:setRows(BGUI.CategoryFilter.filter(items, self.categoryId))
   end
   self.reachPane.categoryId = self.categoryId
-  self.reachPane.title = TLOZ.Strings.reach
+  self.reachPane.title = BGUI.Strings.reach
   self.reachPane:setRows(self:_gatherReachRows(player))
   local inv = player:getInventory()
   self.youPane.capacityText = string.format("%.1f / %.1f kg", inv:getCapacityWeight(), inv:getMaxWeight())
 end
 
-function TLOZ.DualPaneInventory:_gatherReachRows(player)
+function BGUI.DualPaneInventory:_gatherReachRows(player)
   local rows = {}
   local sq = player:getCurrentSquare()
   if not sq then
@@ -133,18 +133,18 @@ function TLOZ.DualPaneInventory:_gatherReachRows(player)
   if #rows == 0 then
     rows[1] = { label = "(vazio)", item = nil }
   end
-  return TLOZ.CategoryFilter.filter(rows, self.categoryId)
+  return BGUI.CategoryFilter.filter(rows, self.categoryId)
 end
 
-function TLOZ.DualPaneInventory:onSwapSide()
+function BGUI.DualPaneInventory:onSwapSide()
   self.side = (self.side == "you") and "reach" or "you"
-  if TLOZ._legend then
+  if BGUI._legend then
     local ctx = (self.side == "you") and "dualpane_you" or "dualpane_reach"
-    TLOZ._legend:setContext(ctx, TLOZ._glyphFamily or "xbox")
+    BGUI._legend:setContext(ctx, BGUI._glyphFamily or "xbox")
   end
 end
 
-function TLOZ.DualPaneInventory:onTabOrCycle(delta)
+function BGUI.DualPaneInventory:onTabOrCycle(delta)
   if self.side == "you" then
     if self.youTab == "equipped" then
       self.youTab = "backpack"
@@ -157,13 +157,13 @@ function TLOZ.DualPaneInventory:onTabOrCycle(delta)
   self:refresh()
 end
 
-function TLOZ.DualPaneInventory:onCycleCategory(delta)
+function BGUI.DualPaneInventory:onCycleCategory(delta)
   if self.side == "you" and self.youTab ~= "backpack" then return end
-  self.categoryId = TLOZ.CategoryFilter.cycle(self.categoryId, delta)
+  self.categoryId = BGUI.CategoryFilter.cycle(self.categoryId, delta)
   self:refresh()
 end
 
-function TLOZ.DualPaneInventory:onNavigate(delta)
+function BGUI.DualPaneInventory:onNavigate(delta)
   if self.side == "you" then
     self.youPane:moveSelection(delta)
   else
@@ -171,14 +171,14 @@ function TLOZ.DualPaneInventory:onNavigate(delta)
   end
 end
 
-function TLOZ.DualPaneInventory:getSelectedItem()
+function BGUI.DualPaneInventory:getSelectedItem()
   local pane = (self.side == "you") and self.youPane or self.reachPane
   if not pane then return nil end
   local row = pane:getSelected()
   return row and row.item
 end
 
-function TLOZ.DualPaneInventory:onConfirmTransfer()
+function BGUI.DualPaneInventory:onConfirmTransfer()
   local player = getSpecificPlayer(self.playerNum)
   if not player then return end
   local srcPane = (self.side == "you") and self.youPane or self.reachPane
@@ -204,7 +204,7 @@ local function joyButton(name, fallback)
   return fallback
 end
 
-function TLOZ.DualPaneInventory:onJoypadDir(dir)
+function BGUI.DualPaneInventory:onJoypadDir(dir)
   if dir == Joypad.UP or dir == "up" then
     self:onNavigate(-1)
   elseif dir == Joypad.DOWN or dir == "down" then
@@ -216,7 +216,7 @@ function TLOZ.DualPaneInventory:onJoypadDir(dir)
   end
 end
 
-function TLOZ.DualPaneInventory:onJoypadDown(button)
+function BGUI.DualPaneInventory:onJoypadDown(button)
   local Y = joyButton("YButton", 3)
   local B = joyButton("BButton", 1)
   local X = joyButton("XButton", 2)
@@ -225,7 +225,7 @@ function TLOZ.DualPaneInventory:onJoypadDown(button)
   local RB = joyButton("RBumper", 5)
 
   if button == Y or button == B then
-    if TLOZ.closeDualPane then TLOZ.closeDualPane(self.playerNum) end
+    if BGUI.closeDualPane then BGUI.closeDualPane(self.playerNum) end
     return true
   end
   if button == X then

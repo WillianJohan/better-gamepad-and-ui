@@ -1,12 +1,12 @@
--- media/lua/shared/TLOZ/ButtonLegendModel.lua
-TLOZ = TLOZ or {}
-TLOZ.ButtonLegendModel = {}
-require "TLOZ/Strings_PT"
-require "TLOZ/JoypadBindMap"
+-- media/lua/shared/BGUI/ButtonLegendModel.lua
+BGUI = BGUI or {}
+BGUI.ButtonLegendModel = {}
+require "BGUI/Strings_PT"
+require "BGUI/JoypadBindMap"
 
-function TLOZ.ButtonLegendModel.buildEntries(context, family)
-  local g = function(a) return TLOZ.JoypadBindMap.glyph(family, a) end
-  local S = TLOZ.Strings
+function BGUI.ButtonLegendModel.buildEntries(context, family)
+  local g = function(a) return BGUI.JoypadBindMap.glyph(family, a) end
+  local S = BGUI.Strings
   if context == "dualpane_you" or context == "dualpane_reach" then
     return {
       { glyph = g("swapSide"), label = S.swapSide },

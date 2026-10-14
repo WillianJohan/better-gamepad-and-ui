@@ -1,7 +1,7 @@
-TLOZ = TLOZ or {}
-TLOZ.RadialSlice = {}
+BGUI = BGUI or {}
+BGUI.RadialSlice = {}
 
-function TLOZ.RadialSlice.build(candidates)
+function BGUI.RadialSlice.build(candidates)
   local out = {}
   for i = 1, #candidates do
     local c = candidates[i]

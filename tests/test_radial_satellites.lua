@@ -46,13 +46,13 @@ function getSpecificPlayer()
   return playerStub
 end
 
-require "TLOZ/FocusStack"
-require "TLOZ/RadialSlice"
-require "TLOZ/Strings_PT"
-package.loaded["TLOZ/RadialHub"] = nil
-require "TLOZ/RadialHub"
-package.loaded["TLOZ/RadialSatellites"] = nil
-require "TLOZ/RadialSatellites"
+require "BGUI/FocusStack"
+require "BGUI/RadialSlice"
+require "BGUI/Strings_PT"
+package.loaded["BGUI/RadialHub"] = nil
+require "BGUI/RadialHub"
+package.loaded["BGUI/RadialSatellites"] = nil
+require "BGUI/RadialSatellites"
 
 local function sliceIds(slices)
   local ids = {}
@@ -63,17 +63,17 @@ end
 local food = { isFood = function() return true end }
 local rock = { isFood = function() return false end }
 
-local foodSlices = TLOZ.RadialSatellites.buildItemSlices(food)
+local foodSlices = BGUI.RadialSatellites.buildItemSlices(food)
 assert(#foodSlices <= 8, "max eight item verbs")
 local foodIds = sliceIds(foodSlices)
 assert(foodIds[1] == "eat" or table.concat(foodIds, ","):find("eat"), "food has eat")
 for _, s in ipairs(foodSlices) do
   assert(not string.find(s.label, "getFullType", 1, true), "not loot browser")
-  assert(s.label == TLOZ.Strings.actionEat or s.label == TLOZ.Strings.actionEquip
-    or s.label == TLOZ.Strings.actionDrop or s.label == TLOZ.Strings.actionInfo, "whitelist labels")
+  assert(s.label == BGUI.Strings.actionEat or s.label == BGUI.Strings.actionEquip
+    or s.label == BGUI.Strings.actionDrop or s.label == BGUI.Strings.actionInfo, "whitelist labels")
 end
 
-local rockSlices = TLOZ.RadialSatellites.buildItemSlices(rock)
+local rockSlices = BGUI.RadialSatellites.buildItemSlices(rock)
 local rockIds = sliceIds(rockSlices)
 for _, id in ipairs(rockIds) do
   assert(id ~= "eat", "non-food hides eat")
@@ -85,11 +85,11 @@ local sqDoor = {
     return (i == 1) and { __door = true } or nil
   end,
 }
-assert(#TLOZ.RadialSatellites.buildWorldSlices(sqNoDoor) == 0, "no door far away")
-local worldDoor = TLOZ.RadialSatellites.buildWorldSlices(sqDoor)
+assert(#BGUI.RadialSatellites.buildWorldSlices(sqNoDoor) == 0, "no door far away")
+local worldDoor = BGUI.RadialSatellites.buildWorldSlices(sqDoor)
 assert(#worldDoor >= 1 and worldDoor[1].id == "door" and worldDoor[1].label == "Porta", "door slice")
 
-local equip = TLOZ.RadialSatellites.buildEquipSlices()
+local equip = BGUI.RadialSatellites.buildEquipSlices()
 assert(#equip == 3, "three equip slots")
 assert(#equip <= 8, "equip whitelist small")
 for _, s in ipairs(equip) do
@@ -97,15 +97,15 @@ for _, s in ipairs(equip) do
   assert(not string.find(s.label, "category", 1, true), "not backpack categories")
 end
 
-TLOZ._focus = TLOZ.FocusStack.new()
-TLOZ._focus:push("world")
-TLOZ._legend = { setContext = function(_, ctx) TLOZ._lastLegendCtx = ctx end }
+BGUI._focus = BGUI.FocusStack.new()
+BGUI._focus:push("world")
+BGUI._legend = { setContext = function(_, ctx) BGUI._lastLegendCtx = ctx end }
 
-TLOZ.RadialSatellites.openEquipQuick({})
-assert(TLOZ._focus:peek() == "radial_sat", "equip opens sat focus")
-assert(TLOZ._satPanel and #TLOZ._satPanel.slices == 3, "equip panel slices")
-assert(TLOZ._lastLegendCtx == "radial_open", "legend radial_open")
-if TLOZ._satPanel.close then TLOZ._satPanel:close() end
+BGUI.RadialSatellites.openEquipQuick({})
+assert(BGUI._focus:peek() == "radial_sat", "equip opens sat focus")
+assert(BGUI._satPanel and #BGUI._satPanel.slices == 3, "equip panel slices")
+assert(BGUI._lastLegendCtx == "radial_open", "legend radial_open")
+if BGUI._satPanel.close then BGUI._satPanel:close() end
 
 -- Build satellite whitelist (Piso/Parede/Móveis/Defesa)
 local buildOpened = {}
@@ -120,18 +120,18 @@ ISBuildWindow = {
   end,
 }
 
-TLOZ.RadialSatellites.openBuild(0)
-assert(TLOZ._focus:peek() == "radial_sat", "build opens sat")
-assert(TLOZ._satPanel and #TLOZ._satPanel.slices == 4, "four build categories")
+BGUI.RadialSatellites.openBuild(0)
+assert(BGUI._focus:peek() == "radial_sat", "build opens sat")
+assert(BGUI._satPanel and #BGUI._satPanel.slices == 4, "four build categories")
 local buildLabels = {}
-for _, s in ipairs(TLOZ._satPanel.slices) do
+for _, s in ipairs(BGUI._satPanel.slices) do
   buildLabels[s.id] = s.label
   assert(not string.find(s.label, "category", 1, true), "build not backpack browser")
 end
 assert(buildLabels.floor == "Piso" and buildLabels.wall == "Parede", "PT build labels")
 assert(buildLabels.furniture == "Móveis" and buildLabels.defense == "Defesa", "PT build labels 2")
-TLOZ._satPanel.selected = 1
-TLOZ._satPanel:confirm()
+BGUI._satPanel.selected = 1
+BGUI._satPanel:confirm()
 assert(buildOpened[1] ~= nil, "build category opens ISBuildWindow")
 
 -- Vehicle: adjacent (outside)
@@ -160,28 +160,28 @@ local outsidePlayer = {
   getVehicle = function() return nil end,
   getPlayerNum = function() return 0 end,
 }
-assert(TLOZ.RadialSatellites.canUseVehicleShortcut(outsidePlayer), "near vehicle shortcut")
-assert(TLOZ.RadialSatellites.findVehicle(outsidePlayer) == fakeVehicle, "find adjacent")
+assert(BGUI.RadialSatellites.canUseVehicleShortcut(outsidePlayer), "near vehicle shortcut")
+assert(BGUI.RadialSatellites.findVehicle(outsidePlayer) == fakeVehicle, "find adjacent")
 
-TLOZ._focus:push("world")
-TLOZ.RadialSatellites.openVehicle(outsidePlayer)
-assert(TLOZ._focus:peek() == "radial_sat", "vehicle sat open")
-local ids = sliceIds(TLOZ._satPanel.slices)
+BGUI._focus:push("world")
+BGUI.RadialSatellites.openVehicle(outsidePlayer)
+assert(BGUI._focus:peek() == "radial_sat", "vehicle sat open")
+local ids = sliceIds(BGUI._satPanel.slices)
 local idset = {}
 for _, id in ipairs(ids) do idset[id] = true end
 assert(idset.enter, "enter when outside near vehicle")
 assert(idset.hood and idset.trunk, "hood/trunk when near")
 assert(not idset.exit, "no exit outside")
-for _, s in ipairs(TLOZ._satPanel.slices) do
+for _, s in ipairs(BGUI._satPanel.slices) do
   if s.id == "enter" then assert(s.label == "Entrar", "PT Entrar") end
   if s.id == "hood" then assert(s.label == "Capô", "PT Capô") end
   if s.id == "trunk" then assert(s.label == "Porta-malas", "PT Porta-malas") end
 end
 -- confirm enter
-for i, s in ipairs(TLOZ._satPanel.slices) do
-  if s.id == "enter" then TLOZ._satPanel.selected = i end
+for i, s in ipairs(BGUI._satPanel.slices) do
+  if s.id == "enter" then BGUI._satPanel.selected = i end
 end
-TLOZ._satPanel:confirm()
+BGUI._satPanel:confirm()
 assert(vehicleCalls[#vehicleCalls] and vehicleCalls[#vehicleCalls][1] == "enter", "enter dispatches")
 
 -- Vehicle: inside
@@ -189,19 +189,19 @@ local insidePlayer = {
   getVehicle = function() return fakeVehicle end,
   getPlayerNum = function() return 0 end,
 }
-assert(TLOZ.RadialSatellites.canUseVehicleShortcut(insidePlayer), "in vehicle shortcut")
-TLOZ._focus:push("world")
-TLOZ.RadialSatellites.openVehicle(insidePlayer)
-ids = sliceIds(TLOZ._satPanel.slices)
+assert(BGUI.RadialSatellites.canUseVehicleShortcut(insidePlayer), "in vehicle shortcut")
+BGUI._focus:push("world")
+BGUI.RadialSatellites.openVehicle(insidePlayer)
+ids = sliceIds(BGUI._satPanel.slices)
 idset = {}
 for _, id in ipairs(ids) do idset[id] = true end
 assert(idset.exit, "exit when inside")
 assert(not idset.enter, "no enter when inside")
 assert(idset.hood and idset.trunk, "hood/trunk inside")
-for _, s in ipairs(TLOZ._satPanel.slices) do
+for _, s in ipairs(BGUI._satPanel.slices) do
   if s.id == "exit" then assert(s.label == "Sair", "PT Sair") end
 end
-if TLOZ._satPanel.close then TLOZ._satPanel:close() end
+if BGUI._satPanel.close then BGUI._satPanel:close() end
 
 -- far from vehicle: no shortcut
 ISVehicleMenu.getVehicleToInteractWith = function() return nil end
@@ -209,6 +209,6 @@ local farPlayer = {
   getVehicle = function() return nil end,
   getPlayerNum = function() return 0 end,
 }
-assert(not TLOZ.RadialSatellites.canUseVehicleShortcut(farPlayer), "no vehicle far away")
-local farSlices = TLOZ.RadialSatellites.buildVehicleSlices(farPlayer)
+assert(not BGUI.RadialSatellites.canUseVehicleShortcut(farPlayer), "no vehicle far away")
+local farSlices = BGUI.RadialSatellites.buildVehicleSlices(farPlayer)
 assert(#farSlices == 0, "empty vehicle radial far away")

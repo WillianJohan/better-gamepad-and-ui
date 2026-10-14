@@ -76,29 +76,29 @@ MainScreen = {
   },
 }
 
-require "TLOZ/FocusStack"
-require "TLOZ/RadialSlice"
-require "TLOZ/Strings_PT"
-package.loaded["TLOZ/RadialHub"] = nil
-require "TLOZ/RadialHub"
-package.loaded["TLOZ/RadialSatellites"] = nil
+require "BGUI/FocusStack"
+require "BGUI/RadialSlice"
+require "BGUI/Strings_PT"
+package.loaded["BGUI/RadialHub"] = nil
+require "BGUI/RadialHub"
+package.loaded["BGUI/RadialSatellites"] = nil
 -- stub satellites so hub build slice can call openBuild without full sat file deps
-TLOZ.RadialSatellites = {
+BGUI.RadialSatellites = {
   openBuild = function()
     calls[#calls + 1] = { "build" }
   end,
 }
 
-TLOZ._focus = TLOZ.FocusStack.new()
-TLOZ._focus:push("world")
-TLOZ._legend = { setContext = function(_, ctx)
-  TLOZ._lastLegendCtx = ctx
+BGUI._focus = BGUI.FocusStack.new()
+BGUI._focus:push("world")
+BGUI._legend = { setContext = function(_, ctx)
+  BGUI._lastLegendCtx = ctx
 end }
 
-local hub = TLOZ.RadialHub:new()
+local hub = BGUI.RadialHub:new()
 hub:open()
-assert(TLOZ._focus:peek() == "radial_hub", "focus radial_hub")
-assert(TLOZ._lastLegendCtx == "radial_open", "legend radial_open")
+assert(BGUI._focus:peek() == "radial_hub", "focus radial_hub")
+assert(BGUI._lastLegendCtx == "radial_open", "legend radial_open")
 assert(#hub.slices == 7, "seven hub slices")
 assert(#hub.slices <= 8, "max eight slices")
 
@@ -120,14 +120,14 @@ hub:setStickDirection(-math.pi / 2)
 assert(hub.selected == 1, "stick up selects first slice")
 
 local dualOpened = false
-TLOZ.openDualPane = function(n)
+BGUI.openDualPane = function(n)
   dualOpened = true
   assert(n == 0, "player 0")
 end
 hub.selected = 1
 hub:confirm()
 assert(dualOpened, "inventory slice opens DualPane")
-assert(TLOZ._focus:peek() == "world", "hub closed restores world focus")
+assert(BGUI._focus:peek() == "world", "hub closed restores world focus")
 
 local function confirmSlice(id)
   hub:open()
@@ -162,4 +162,4 @@ assert(calls[#calls] and calls[#calls][1] == "build", "build opens satellite")
 
 hub:open()
 hub:close()
-assert(TLOZ._focus:peek() == "world", "close pops focus")
+assert(BGUI._focus:peek() == "world", "close pops focus")

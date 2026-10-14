@@ -1,6 +1,6 @@
--- media/lua/shared/TLOZ/Strings_PT.lua
-TLOZ = TLOZ or {}
-TLOZ.Strings = {
+-- media/lua/shared/BGUI/Strings_PT.lua
+BGUI = BGUI or {}
+BGUI.Strings = {
   you = "VOCÊ",
   reach = "ALCANCE",
   tabEquipped = "Equipado",

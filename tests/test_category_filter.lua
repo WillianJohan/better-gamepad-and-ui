@@ -1,9 +1,9 @@
 -- tests/test_category_filter.lua
 package.path = package.path .. ";../media/lua/shared/?.lua"
-require "TLOZ/Strings_PT"
-require "TLOZ/CategoryFilter"
+require "BGUI/Strings_PT"
+require "BGUI/CategoryFilter"
 
-local C = TLOZ.CategoryFilter
+local C = BGUI.CategoryFilter
 assert(#C.ORDER >= 8)
 assert(C.classify("Base.Axe") == "weapons")
 assert(C.classify("Base.Bullets9mm") == "ammo")

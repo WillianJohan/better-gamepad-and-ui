@@ -1,6 +1,6 @@
--- media/lua/shared/TLOZ/JoypadBindMap.lua
-TLOZ = TLOZ or {}
-TLOZ.JoypadBindMap = {
+-- media/lua/shared/BGUI/JoypadBindMap.lua
+BGUI = BGUI or {}
+BGUI.JoypadBindMap = {
   ps = {
     confirm = "✕",
     cancel = "○",
@@ -23,12 +23,12 @@ TLOZ.JoypadBindMap = {
   },
 }
 
-function TLOZ.JoypadBindMap.glyph(family, action)
-  local t = TLOZ.JoypadBindMap[family] or TLOZ.JoypadBindMap.xbox
+function BGUI.JoypadBindMap.glyph(family, action)
+  local t = BGUI.JoypadBindMap[family] or BGUI.JoypadBindMap.xbox
   return t[action] or "?"
 end
 
-function TLOZ.JoypadBindMap.detectFamily(controllerName)
+function BGUI.JoypadBindMap.detectFamily(controllerName)
   local n = string.lower(controllerName or "")
   if string.find(n, "dualsense", 1, true) or string.find(n, "wireless controller", 1, true)
       or string.find(n, "playstation", 1, true) then

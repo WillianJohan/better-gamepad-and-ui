@@ -12,7 +12,7 @@ elif [ -d "$FLATPAK_ZOMBOID" ]; then ZOMBOID_DIR="$FLATPAK_ZOMBOID"
 else ZOMBOID_DIR="$HOME/Zomboid"; fi
 mkdir -p "$ZOMBOID_DIR/mods"
 
-ID="TheLastOfZ_Gamepad"
+ID="BetterGamepadAndUI"
 SRC="$REPO/mod"
 DEST="$ZOMBOID_DIR/mods/${ID}_Staging"
 if [ -L "$DEST" ]; then rm "$DEST" && echo "symlink antigo removido"; fi

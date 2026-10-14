@@ -1,9 +1,9 @@
--- media/lua/client/TLOZ/ButtonLegend.lua
-require "TLOZ/ButtonLegendModel"
-TLOZ = TLOZ or {}
-TLOZ.ButtonLegend = ISUIElement:derive("TLOZ.ButtonLegend")
+-- media/lua/client/BGUI/ButtonLegend.lua
+require "BGUI/ButtonLegendModel"
+BGUI = BGUI or {}
+BGUI.ButtonLegend = ISUIElement:derive("BGUI.ButtonLegend")
 
-function TLOZ.ButtonLegend:new(x, y, w, h)
+function BGUI.ButtonLegend:new(x, y, w, h)
   local o = ISUIElement:new(x, y, w, h)
   setmetatable(o, self)
   self.__index = self
@@ -12,13 +12,13 @@ function TLOZ.ButtonLegend:new(x, y, w, h)
   return o
 end
 
-function TLOZ.ButtonLegend:setContext(context, family)
+function BGUI.ButtonLegend:setContext(context, family)
   self.context = context
   self.family = family or self.family
 end
 
-function TLOZ.ButtonLegend:render()
-  local entries = TLOZ.ButtonLegendModel.buildEntries(self.context, self.family)
+function BGUI.ButtonLegend:render()
+  local entries = BGUI.ButtonLegendModel.buildEntries(self.context, self.family)
   local x = 8
   for i = 1, #entries do
     local e = entries[i]
