@@ -1,0 +1,8 @@
+name=The Last of Z — GamePad
+id=TheLastOfZ_Gamepad
+description=UI e inputs no controle para Project Zomboid: shell gamepad, inventário dual-pane Abas, hub radial e DualSense com fallback.
+poster=
+author=Johan
+modversion=0.1.0
+versionMin=42.0
+url=https://github.com/WillianJohan/the-last-of-z-gamepad
