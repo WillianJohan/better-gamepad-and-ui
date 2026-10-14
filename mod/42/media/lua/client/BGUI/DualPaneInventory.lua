@@ -19,19 +19,40 @@ function BGUI.DualPaneInventory:new(playerNum)
   o.categoryId = "weapons"
   o.reachIndex = 1
   o.backgroundColor = { r = 0, g = 0, b = 0, a = 0.75 }
+  o.borderColor = { r = 0.55, g = 0.55, b = 0.35, a = 1 }
   return o
 end
 
+function BGUI.DualPaneInventory:prerender()
+  self:drawRect(0, 0, self.width, self.height,
+    self.backgroundColor.a or 0.75,
+    self.backgroundColor.r or 0,
+    self.backgroundColor.g or 0,
+    self.backgroundColor.b or 0)
+  if self.borderColor then
+    self:drawRectBorder(0, 0, self.width, self.height,
+      self.borderColor.a or 1,
+      self.borderColor.r or 0.4,
+      self.borderColor.g or 0.4,
+      self.borderColor.b or 0.4)
+  end
+end
+
 function BGUI.DualPaneInventory:open()
+  if self.initialise then self:initialise() end
   local half = math.floor(self.width / 2) - 8
   self.youPane = BGUI.InventoryListPane:new(8, 8, half, self.height - 16, BGUI.Strings.you)
   self.reachPane = BGUI.InventoryListPane:new(half + 16, 8, half, self.height - 16, BGUI.Strings.reach)
   self.reachPane.showCategory = true
+  if self.youPane.initialise then self.youPane:initialise() end
+  if self.reachPane.initialise then self.reachPane:initialise() end
   self:addChild(self.youPane)
   self:addChild(self.reachPane)
   self:setVisible(true)
   self:refresh()
   self:addToUIManager()
+  if self.bringToTop then self:bringToTop() end
+  if self.setAlwaysOnTop then self:setAlwaysOnTop(true) end
   if BGUI.GamepadShell and BGUI.GamepadShell.hideVanillaInventory then
     BGUI.GamepadShell:hideVanillaInventory(self.playerNum)
   end
@@ -45,6 +66,9 @@ function BGUI.DualPaneInventory:open()
     local idx = self.playerNum + 1
     if JoypadState.players[idx] then
       JoypadState.players[idx].focus = self
+      if setJoypadFocus then
+        setJoypadFocus(self.playerNum, self)
+      end
     end
   end
 end

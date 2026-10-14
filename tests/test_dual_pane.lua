@@ -11,12 +11,18 @@ function ISPanel:new(x, y, w, h)
     width = w,
     height = h,
     children = {},
+    backgroundColor = { r = 0, g = 0, b = 0, a = 0.75 },
+    borderColor = { r = 0.4, g = 0.4, b = 0.4, a = 1 },
     drawRect = function() end,
+    drawRectBorder = function() end,
     drawText = function() end,
     addChild = function(self, c) self.children[#self.children + 1] = c end,
     setVisible = function() end,
     addToUIManager = function() end,
     removeFromUIManager = function() end,
+    initialise = function() end,
+    bringToTop = function() end,
+    setAlwaysOnTop = function() end,
   }
 end
 function ISPanel:derive(_)

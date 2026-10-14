@@ -124,20 +124,46 @@ local bootOk, bootErr = pcall(function()
     end
   end
 
+  local function dualPaneBusy()
+    local t = 0
+    if getTimestampMs then t = getTimestampMs() end
+    if BGUI._dualPaneEdgeMs and t > 0 and (t - BGUI._dualPaneEdgeMs) < 350 then
+      return true
+    end
+    return false
+  end
+
+  local function markDualPaneEdge()
+    if getTimestampMs then
+      BGUI._dualPaneEdgeMs = getTimestampMs()
+    end
+  end
+
   local function openDualPane(playerNum)
     BGUI.enterGamepadMode()
     if not BGUI._router or BGUI._router:getMode() ~= BGUI.InputMode.GAMEPAD then return end
+    if dualPaneBusy() then return end
+    markDualPaneEdge()
     if BGUI._dualPane then
       BGUI._dualPane:close()
       BGUI._dualPane = nil
+      print("[BGUI] dual-pane close player=" .. tostring(playerNum or 0))
       return
     end
     if BGUI.GamepadShell and BGUI.GamepadShell.hideVanillaInventory then
       BGUI.GamepadShell:hideVanillaInventory(playerNum or 0)
     end
-    BGUI._dualPane = BGUI.DualPaneInventory:new(playerNum or 0)
-    BGUI._dualPane:open()
-    print("[BGUI] dual-pane open player=" .. tostring(playerNum or 0))
+    local ok, err = pcall(function()
+      BGUI._dualPane = BGUI.DualPaneInventory:new(playerNum or 0)
+      BGUI._dualPane:open()
+    end)
+    if not ok then
+      BGUI._dualPane = nil
+      print("[BGUI] dual-pane open failed: " .. tostring(err))
+      return
+    end
+    print("[BGUI] dual-pane open player=" .. tostring(playerNum or 0)
+      .. " focus=" .. tostring(BGUI._focus and BGUI._focus:peek()))
   end
 
   local function closeDualPane(playerNum)
@@ -220,15 +246,9 @@ local bootOk, bootErr = pcall(function()
       return
     end
 
+    -- Y: só via ISButtonPrompt.cmdShowInventory (hook). Poll no mesmo frame
+    -- abria e fechava o dual-pane (open → focus dualpane → close).
     local yHeld = BGUI.GamepadShell:_yHeld(playerNum)
-    if yHeld and not BGUI._yWasHeld then
-      local focus = BGUI._focus and BGUI._focus:peek()
-      if focus == "world" or focus == nil then
-        openDualPane(playerNum)
-      elseif focus == "dualpane" then
-        dispatchJoypadDown(joyButton("YButton", 3), playerNum)
-      end
-    end
     BGUI._yWasHeld = yHeld
 
     local bHeld = BGUI.GamepadShell:_buttonHeld(playerNum, "_testBHeld", "BButton", 1, "isBPressed")

@@ -107,4 +107,8 @@ JoypadState.players[1].controller = { id = 0 }
 JoypadState.controllers[0].pressed[3] = true
 assert(BGUI.GamepadShell:_yHeld(0) == true, "Y via isButtonDown fallback")
 
+JoypadState = nil
+Joypad = nil
+JoypadButton = nil
+
 print("OK test_joypad_buttons")
