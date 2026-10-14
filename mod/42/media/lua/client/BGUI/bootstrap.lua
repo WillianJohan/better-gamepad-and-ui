@@ -29,24 +29,44 @@ local bootOk, bootErr = pcall(function()
     return fallback
   end
 
-  --- True se algum player já tem joypad atribuído (JoypadState.players).
+  --- True se há joypad jogável (players[] ou joypad com player atribuído).
   function BGUI.isJoypadAssigned()
-    if not JoypadState or not JoypadState.players then return false end
-    for i = 1, 4 do
-      if JoypadState.players[i] then return true end
+    if not JoypadState then return false end
+    if JoypadState.players then
+      for i = 1, 4 do
+        if JoypadState.players[i] then return true end
+      end
+    end
+    -- player 0 é válido — usar ~= nil, não truthiness
+    if JoypadState.joypads then
+      for i = 1, 4 do
+        local jd = JoypadState.joypads[i]
+        if jd and jd.player ~= nil and jd.controller and jd.controller.connected then
+          return true
+        end
+      end
+    end
+    if JoypadState.controllers then
+      for id = 0, 15 do
+        local c = JoypadState.controllers[id]
+        if c and c.connected and c.joypad and c.joypad.player ~= nil then
+          return true
+        end
+      end
     end
     return false
   end
 
   local function controllerNameFromJoypad(joypadId)
     if not JoypadState then return "" end
-    local idx = nil
-    if type(joypadId) == "number" then
-      idx = joypadId + 1
-    end
     local j = nil
-    if idx and JoypadState.players then
-      j = JoypadState.players[idx]
+    -- OnJoypadActivate passa id do controller (0..15), não índice de player.
+    if type(joypadId) == "number" and JoypadState.controllers then
+      local c = JoypadState.controllers[joypadId]
+      if c and c.getName then
+        return c:getName() or ""
+      end
+      if c and c.joypad then j = c.joypad end
     end
     if not j and JoypadState.players then
       for i = 1, 4 do
@@ -67,12 +87,18 @@ local bootOk, bootErr = pcall(function()
 
   --- Força modo gamepad + GamepadShell (idempotente se já estiver nele).
   function BGUI.enterGamepadMode(joypadId)
+    local prev = BGUI._router and BGUI._router:getMode() or nil
     local name = controllerNameFromJoypad(joypadId)
     if BGUI.JoypadBindMap and BGUI.JoypadBindMap.detectFamily then
       BGUI._glyphFamily = BGUI.JoypadBindMap.detectFamily(name)
     end
     if BGUI._router then
       BGUI._router:onDecisiveInput("gamepad")
+    end
+    if prev ~= BGUI.InputMode.GAMEPAD then
+      print("[BGUI] enter gamepad shell=" .. tostring(BGUI._activeShell)
+        .. " joypad=" .. tostring(BGUI.isJoypadAssigned())
+        .. " glyph=" .. tostring(BGUI._glyphFamily))
     end
   end
 
@@ -86,17 +112,20 @@ local bootOk, bootErr = pcall(function()
   end
 
   local function onJoypadActivate(joypadId)
-    -- B42: OnJoypadActivate(joypadId: integer), não joypadData.
+    -- B42: OnJoypadActivate(joypadId: integer = controller id).
     BGUI.enterGamepadMode(joypadId)
   end
 
   local function onKeyPressed(key)
+    -- Com pad atribuído, não voltar pra KBM por tecla (console de debug dispara isso).
+    if BGUI.isJoypadAssigned and BGUI.isJoypadAssigned() then return end
     if BGUI._router and BGUI._router:getMode() == BGUI.InputMode.GAMEPAD then
       router:onDecisiveInput("keyboard")
     end
   end
 
   local function openDualPane(playerNum)
+    BGUI.enterGamepadMode()
     if not BGUI._router or BGUI._router:getMode() ~= BGUI.InputMode.GAMEPAD then return end
     if BGUI._dualPane then
       BGUI._dualPane:close()
@@ -108,6 +137,7 @@ local bootOk, bootErr = pcall(function()
     end
     BGUI._dualPane = BGUI.DualPaneInventory:new(playerNum or 0)
     BGUI._dualPane:open()
+    print("[BGUI] dual-pane open player=" .. tostring(playerNum or 0))
   end
 
   local function closeDualPane(playerNum)
@@ -283,6 +313,28 @@ local bootOk, bootErr = pcall(function()
 
   -- Cold start / reload: se o pad já está ativo, não esperar OnJoypadActivate de novo.
   BGUI.syncInputModeFromHardware()
+
+  -- B42: Y do pad chama ISButtonPrompt.cmdShowInventory — redireciona pro dual-pane.
+  -- Marcador na classe (não em BGUI) pra não re-embrulhar no hot-reload.
+  if ISButtonPrompt and not ISButtonPrompt._bguiInvHooked then
+    ISButtonPrompt._bguiInvHooked = true
+    local origInv = ISButtonPrompt.cmdShowInventory
+    local origLoot = ISButtonPrompt.cmdShowLoot
+    function ISButtonPrompt:cmdShowInventory()
+      if BGUI and BGUI.openDualPane then
+        BGUI.openDualPane(self.player or 0)
+        return
+      end
+      if origInv then return origInv(self) end
+    end
+    function ISButtonPrompt:cmdShowLoot()
+      if BGUI and BGUI.openDualPane then
+        BGUI.openDualPane(self.player or 0)
+        return
+      end
+      if origLoot then return origLoot(self) end
+    end
+  end
 
   if not BGUI._router then
     error("UIShell.start did not set BGUI._router")

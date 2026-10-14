@@ -31,6 +31,7 @@ local tests = {
   "test_radial_hub.lua",
   "test_radial_satellites.lua",
   "test_dualsense_policy.lua",
+  "test_joypad_buttons.lua",
   "test_reload.lua",
 }
 for _, t in ipairs(tests) do

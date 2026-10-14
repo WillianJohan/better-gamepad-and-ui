@@ -77,35 +77,75 @@ local function joyButton(name, fallback)
   return fallback
 end
 
-local LB = joyButton("LBumper", 4)
-local LT = joyButton("LeftTrigger", 6)
-local RT = joyButton("RightTrigger", 7)
-local A = joyButton("AButton", 0)
+--- B42: Joypad.YButton é JoypadButton enum; pressed[] usa índice numérico.
+function BGUI.joypadButtonIndex(joyNameOrButton, fallback)
+  local b = joyNameOrButton
+  if type(b) == "string" then
+    b = Joypad and Joypad[b]
+  end
+  if type(b) == "number" then return b end
+  if b == nil then return fallback end
+  if JoypadButton and JoypadButton.toIndex then
+    local ok, idx = pcall(function()
+      return JoypadButton.toIndex(b)
+    end)
+    if ok and type(idx) == "number" then return idx end
+  end
+  if type(b) == "userdata" or type(b) == "table" then
+    if b.ordinal then
+      local ok, idx = pcall(function() return b:ordinal() end)
+      if ok and type(idx) == "number" then return idx end
+    end
+    if b.index then
+      local ok, idx = pcall(function() return b:index() end)
+      if ok and type(idx) == "number" then return idx end
+    end
+  end
+  if JoypadButton and JoypadButton.fromIndex then
+    for n = 0, 15 do
+      local ok, cand = pcall(function()
+        return JoypadButton.fromIndex(n)
+      end)
+      if ok and cand == b then return n end
+    end
+  end
+  return fallback
+end
 
-function BGUI.GamepadShell:_buttonHeld(playerNum, testKey, joyName, fallback, joyField)
-  if BGUI[testKey] ~= nil then return BGUI[testKey] end
+local function controllerForPlayer(playerNum)
   local idx = (playerNum or 0) + 1
-  if not JoypadState or not JoypadState.players then return false end
+  if not JoypadState or not JoypadState.players then return nil, nil end
   local j = JoypadState.players[idx]
+  if not j then return nil, nil end
+  local c = j.controller
+  if not c and j.getController then
+    c = j:getController()
+  end
+  return j, c
+end
+
+function BGUI.GamepadShell:_buttonHeld(playerNum, testKey, joyName, fallback, _joyField)
+  if BGUI[testKey] ~= nil then return BGUI[testKey] == true end
+  local j, c = controllerForPlayer(playerNum)
   if not j then return false end
-  if joyField and j[joyField] then return j[joyField] end
-  if j.controller and j.controller.isButtonPressed then
-    return j.controller:isButtonPressed(joyButton(joyName, fallback))
+  local bi = BGUI.joypadButtonIndex(joyName, fallback)
+  if c and c.pressed ~= nil and c.pressed[bi] == true then
+    return true
+  end
+  local id = nil
+  if c and c.id ~= nil then id = c.id end
+  if id == nil and j.id ~= nil then id = j.id end
+  if id ~= nil and id >= 0 and JoypadButton and JoypadButton.isButtonDown then
+    local ok, down = pcall(function()
+      return JoypadButton.isButtonDown(id, bi)
+    end)
+    if ok and down == true then return true end
   end
   return false
 end
 
 function BGUI.GamepadShell:_lbHeld(playerNum)
-  if BGUI._testLbHeld ~= nil then return BGUI._testLbHeld end
-  local idx = (playerNum or 0) + 1
-  if not JoypadState or not JoypadState.players then return false end
-  local j = JoypadState.players[idx]
-  if not j then return false end
-  if j.isLBPressed then return j.isLBPressed end
-  if j.controller and j.controller.isButtonPressed then
-    return j.controller:isButtonPressed(LB)
-  end
-  return false
+  return self:_buttonHeld(playerNum, "_testLbHeld", "LBumper", 4, nil)
 end
 
 function BGUI.GamepadShell:_ltHeld(playerNum)
